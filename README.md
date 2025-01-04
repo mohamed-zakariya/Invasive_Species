@@ -39,6 +39,11 @@ The dataset for this project is sourced from the Kaggle: **[Invasive Species Mon
 - Integration of multi-modal data to improve model accuracy.
 - Implementation of dynamic data augmentation for broader ecological applicability.
 
+
+## Deployed Model on Hugging Face
+- [Hugging Face](https://huggingface.co/spaces/MohamedZakaria170/invasive-species-detection)
+
+
 ## Research Paper
 
 The research paper detailing the methods and results of this project is available here:
