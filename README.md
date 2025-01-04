@@ -44,9 +44,9 @@ The dataset for this project is sourced from the Kaggle: **[Invasive Species Mon
 - [Hugging Face](https://huggingface.co/spaces/MohamedZakaria170/invasive-species-detection)
 
 
-## Research Paper
+## Academic Research Paper
 
 The research paper detailing the methods and results of this project is available here:
 
-- [Download PDF](docs/paper.pdf)
+- [Download PAPER](docs/paper.pdf)
 
