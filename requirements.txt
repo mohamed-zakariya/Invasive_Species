@@ -8,4 +8,5 @@ PySocks==1.7.1
 scikit-learn==1.5.2
 seaborn==0.13.2
 tensorflow==2.10.0
+numpy<1.24  # Ensure compatibility with TensorFlow 2.10.0
 win-inet-pton==1.1.0

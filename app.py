@@ -8,12 +8,20 @@ from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 CORS(app)
 
-# Load the final model globally
-MODEL_PATH = "mobilenet_final.keras"
-if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError(f"Model file not found at: {MODEL_PATH}")
-model = load_model(MODEL_PATH)
-print(f"Model loaded from {MODEL_PATH}")
+# Paths to the model files
+MODELS = {
+    "mobilenet": "mobilenet_final.keras",
+    "handcrafted": "mobilenet_final.keras"
+}
+
+# Ensure model files exist
+for model_name, model_path in MODELS.items():
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file for {model_name} not found at: {model_path}")
+
+# Load models into memory
+loaded_models = {name: load_model(path) for name, path in MODELS.items()}
+print(f"Models loaded: {', '.join(loaded_models.keys())}")
 
 def preprocess_image(image_path, target_size=(224, 224)):
     """
@@ -25,9 +33,9 @@ def preprocess_image(image_path, target_size=(224, 224)):
     img_array /= 255.0  # Normalize the image
     return img_array
 
-def predict_image(image_path):
+def predict_image(image_path, model):
     """
-    Preprocess the image and make a prediction using the loaded model.
+    Preprocess the image and make a prediction using the specified model.
     """
     # Preprocess the image
     img_array = preprocess_image(image_path)
@@ -38,10 +46,15 @@ def predict_image(image_path):
     # Return the predicted class
     return 1 if prediction >= 0.5 else 0
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict/<model_name>', methods=['POST'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
-def predict():
+def predict(model_name):
     try:
+        # Check if the model exists
+        if model_name not in loaded_models:
+            return jsonify({'error': f"Model '{model_name}' not found"}), 400
+
+        # Ensure a file is included in the request
         if 'file' not in request.files:
             return jsonify({'error': 'No file part'}), 400
 
@@ -58,16 +71,14 @@ def predict():
         image_path = os.path.join(uploads_dir, file.filename)
         file.save(image_path)
 
-        # Perform prediction
-        predicted_class = predict_image(image_path)
+        # Perform prediction with the specified model
+        model = loaded_models[model_name]
+        predicted_class = predict_image(image_path, model)
 
         # Map prediction to class name
-        if predicted_class == 0:
-            predicted_class = 'Non Invasive'
-        else:
-            predicted_class = 'Invasive'
-        
-        print(predicted_class)
+        predicted_class = 'Invasive' if predicted_class == 1 else 'Non Invasive'
+
+        print(f"Model: {model_name}, Prediction: {predicted_class}")
         return jsonify({'predicted_class': predicted_class, 'image_path': image_path})
 
     except Exception as e:

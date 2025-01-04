@@ -1,29 +1,36 @@
-# Use an official Python base image
-FROM python:3.10-slim
+# Use an official Python slim image as a base with version 3.10.15
+FROM python:3.10.15-slim
 
-# Set environment variables to prevent Python from generating .pyc files
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/venv/bin:$PATH"
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Install system dependencies for Python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpq-dev curl && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy only requirements.txt first (to leverage Docker layer caching)
 COPY requirements.txt /app/requirements.txt
 
-# Copy the application files into the container
-COPY . /app/
-
-# Install dependencies (and create a virtual environment)
+# Create a virtual environment and install dependencies
 RUN python -m venv /app/venv && \
     /app/venv/bin/pip install --no-cache-dir --upgrade pip && \
     /app/venv/bin/pip install --no-cache-dir -r /app/requirements.txt
 
-# Expose ports for applications (e.g., Flask or Django server)
+# Copy the rest of the application files
+COPY . /app/
+
+# Expose the application port (5000 for Flask)
 EXPOSE 5000
 
-# Set environment variable to activate the virtual environment
-ENV PATH="/app/venv/bin:$PATH"
+# Add a HEALTHCHECK to monitor the container's health
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:5000/ || exit 1
 
-# Set the default command to start the server (replace 'app.py' with your app's main file)
+# Set the default command to start the app
 CMD ["python", "app.py"]

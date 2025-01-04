@@ -105,6 +105,12 @@
 
 <main>
     <div class="upload-container">
+        <label for="modelSelect">Choose a model:</label>
+        <select id="modelSelect">
+            <option value="mobilenet">MobileNet</option>
+            <option value="handcrafted">Handcrafted</option>
+        </select>
+        <br><br>
         <input type="file" name="file" accept="image/*" required>
         <br><br>
         <button id="uploadForm" type="button">Upload & Predict</button>
@@ -154,20 +160,26 @@
         const formData = new FormData();
         const fileInput = document.querySelector('input[type="file"]');
         const file = fileInput.files[0];
+        const modelSelect = document.getElementById('modelSelect');
+        const selectedModel = modelSelect.value;
+
         if (!file) {
             alert('Please select an image first.');
             return;
         }
         formData.append("file", file);
 
-        // Update the fetch URL to point to your Flask server (http://localhost:5000)
-        fetch('http://127.0.0.1:5000/predict', {
+        // Determine the API endpoint based on the selected model
+        const endpoint = `http://127.0.0.1:5000/predict/${selectedModel}`;
+
+        fetch(endpoint, {
             method: 'POST',
             body: formData
         })
         .then(response => response.json())
         .then(data => {
             let result = '';
+            let image_path = '';
             if (data.predicted_class && data.image_path) {
                 result = `Prediction: ${data.predicted_class}`;
                 image_path = data.image_path;
