@@ -25,12 +25,15 @@ The dataset for this project is sourced from the Kaggle: **[Invasive Species Mon
    ```bash
    git clone https://github.com/your-username/invasive-species-detection.git
    cd invasive-species-detection
+   ```
 2. Build the Docker Image:
    ```bash
    docker build -t invasive-species-detection .
+   ```
 3. Run the Docker Container
    ```bash
    docker run -p 5000:5000 invasive-species-detection
+   ```
    
 ## Future Directions
 - Integration of multi-modal data to improve model accuracy.
