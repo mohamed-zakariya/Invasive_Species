@@ -43,10 +43,3 @@ The dataset for this project is sourced from the Kaggle: **[Invasive Species Mon
 ## Deployed Model on Hugging Face
 - [Hugging Face](https://huggingface.co/spaces/MohamedZakaria170/invasive-species-detection)
 
-
-## Academic Research Paper
-
-The research paper detailing the methods and results of this project is available here:
-
-- [Download PAPER](docs/Enhancing%20Sustainability%20of%20Invasive%20Species%20Management(Complete%20Version).pdf)
-
